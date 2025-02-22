@@ -6,14 +6,14 @@ import { userLoginSchema } from '../validation';
 import { compare } from 'bcryptjs';
 
 export const userLogin = async ({
-    username,
+    email,
     password
 }: UserLoginData): Promise<{
     user: User | null;
     error: ApiError | null
 }>=>{
 
-    const result = userLoginSchema.safeParse({username,password})
+    const result = userLoginSchema.safeParse({email,password})
 
     if (!result.success){
         return{
@@ -23,13 +23,13 @@ export const userLogin = async ({
     }
 
     const user = await prisma.user.findUnique({
-        where: { username },
+        where: { email },
     });
 
   if (!user) {
     return {
       user: null,
-      error: new ApiError(`Username : ${username} does not exist.`, 404),
+      error: new ApiError(`Email : ${email} does not exist.`, 404),
     };
   }
 

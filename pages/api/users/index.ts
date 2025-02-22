@@ -1,3 +1,4 @@
+//  /api/users
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ClientUser } from '@/types/models/User';
 import { createUser } from '@/lib-server/services/users';

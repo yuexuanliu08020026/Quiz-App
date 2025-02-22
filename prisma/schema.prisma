@@ -1,6 +1,18 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+/*
+https://prisma.org.cn/docs/orm/prisma-schema/data-model/relations/many-to-many-relations
 
+1-> n:
+user -> session
+quiz -> question     // 包含关系   (question无法脱离quiz单独存在)
+question -> answer   // 包含关系   (answer无法脱离question单独存在)
+
+
+n->n:
+quiz <-> user       //  quiz 和user可以脱离相互独立存在
+
+*/
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,24 +23,58 @@ datasource db {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique @map("session_token")
+  id           String         @id @default(cuid())
+  sessionToken String         @unique @map("session_token")
   expires      DateTime  
-  userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String         @map("user_id") // foreign key
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)  // relation
 
   @@map("sessions")
 }
 
 model User {
-  id        String  @id @default(cuid()) // uuid, cuid, autoincreament
+  id        String            @id @default(cuid()) // uuid, cuid, autoincreament
   username  String?  
-  email     String  @unique
+  email     String            @unique
   password  String
   image     String?
   sessions      Session[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   @@map("users")
+}
+
+model Quiz {
+  id               String     @id @default(cuid())
+  subject          String
+  description      String
+  title            String
+  authorid         String
+  authorname       String
+  isPublished      Boolean
+  questions        Question[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model Answer {
+  id              String      @id @default(cuid())
+  prompt          String
+  isCorrect       Boolean
+  questionId      String      @map("question_id") // foreign key
+  question        Question    @relation(fields: [questionId], references: [id]) // Establish relation
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model Question {
+  id               String     @id @default(cuid())
+  promp            String
+  answers          Answer[]
+  quizId           String     @map("quiz_id") // foreign key
+  quiz             Quiz       @relation(fields: [quizId], references: [id]) // Establish relation
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
 }

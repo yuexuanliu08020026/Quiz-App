@@ -10,7 +10,7 @@ import { RequiredNotNull} from '@/types';
 export type ClientUser = Omit<User, 'password'>;
 
 export type UserLoginData = {
-    username: string;
+    email: string;
     password:string;
 }
 
