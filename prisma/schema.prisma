@@ -13,6 +13,11 @@ n->n:
 quiz <-> user       //  quiz 和user可以脱离相互独立存在
 
 */
+enum Role {
+  USER
+  ADMIN
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,30 +28,28 @@ datasource db {
 }
 
 model Session {
-  id           String         @id @default(cuid())
-  sessionToken String         @unique @map("session_token")
-  expires      DateTime  
-  userId       String         @map("user_id") // foreign key
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)  // relation
-
-  @@map("sessions")
+  id              String            @id @default(cuid())
+  sessionToken    String            @unique @map("session_token")
+  expires         DateTime  
+  userId          String            @map("user_id") // foreign key
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)  // relation
 }
 
 model User {
-  id        String            @id @default(cuid()) // uuid, cuid, autoincreament
-  username  String?  
-  email     String            @unique
-  password  String
-  image     String?
-  sessions      Session[]
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-
-  @@map("users")
+  id              String            @id @default(cuid()) // uuid, cuid, autoincreament
+  username        String            @unique  
+  email           String            @unique
+  password        String
+  image           String?
+  role            Role              
+  sessions        Session[]
+  attempts        Attempt[]        // answer quiz history
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 }
 
 model Quiz {
-  id               String     @id @default(cuid())
+  id               String           @id @default(cuid())
   subject          String
   description      String
   title            String
@@ -54,27 +57,42 @@ model Quiz {
   authorname       String
   isPublished      Boolean
   questions        Question[]
+  attempts         Attempt[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }
 
-model Answer {
-  id              String      @id @default(cuid())
-  prompt          String
-  isCorrect       Boolean
-  questionId      String      @map("question_id") // foreign key
-  question        Question    @relation(fields: [questionId], references: [id]) // Establish relation
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+model Question {
+  id               String            @id @default(cuid())
+  content          String
+  quizId           String            @map("quiz_id") // foreign key
+  quiz             Quiz              @relation(fields: [quizId], references: [id]) // Establish relation
+  attemptEntry     AttemptRecord[]
+  correctAnswer    Json
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
-model Question {
-  id               String     @id @default(cuid())
-  promp            String
-  answers          Answer[]
-  quizId           String     @map("quiz_id") // foreign key
-  quiz             Quiz       @relation(fields: [quizId], references: [id]) // Establish relation
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+model Attempt {
+  id                String           @id @default(cuid())
+  userId            String           @map("user_id") // foreign key
+  user              User             @relation(fields: [userId], references: [id])
+  quizId            String           @map("quiz_id") // foreign key
+  quiz              Quiz             @relation(fields: [quizId], references: [id])
+  score             Int              @default(0)  // Final score
+  attemptQuestions  AttemptRecord[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
 
+model AttemptRecord {
+  id                String           @id @default(cuid())
+  attemptId         String           @map("attempt_id") // foreign key 
+  attempt           Attempt          @relation(fields: [attemptId], references: [id])
+  questionId        String           @map("question_id")
+  question          Question         @relation(fields: [questionId], references: [id])
+  answer            String
+  isCorrect         Boolean
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
