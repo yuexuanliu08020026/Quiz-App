@@ -1,7 +1,7 @@
 import prisma from "@/lib-server/prisma"
 import { AttemptRecord, Prisma} from '@prisma/client';
 import ApiError from '@/lib-server/error';
-import { QuizAnswerSubmit, QuestionAnswerPair, QuizQueryData, QuizEntity } from "@/types/models/Quiz";
+import { QuizAnswerSubmit, QuizQueryData, QuizEntity } from "@/types/models/Quiz";
 import { SortDirection } from '@/types';
 import { filterSearchTerm } from '@/utils';
 import { Answer } from "@/types/models/Answer";
@@ -28,26 +28,28 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
 
     let qlist = quiz.questions;
     const attemptId = createId();
-    let results: AttemptRecord[] = answer.qaList.map( (x:QuestionAnswerPair) => {
-        const questions = qlist?.filter( entity => entity.id == x.questionId)
+    let attemptRecords: AttemptRecord[] = new Array<AttemptRecord>();
+
+    for (const [questionId, answerSet] of Object.entries(answer.qaList)) {
+        const questions = qlist?.filter( entity => entity.id == questionId)
         let question = null
         if (!questions || questions.length != 1){
-            throw new ApiError(`Question conflict for question id: ${x.questionId}`, 500)
+            throw new ApiError(`Question conflict for question id: ${questionId}`, 500)
         }
         else{
             question = questions[0]
+            console.log(`Processing Question ID: ${questionId}`);
         }
-        const userAnswer : Answer = Answer.deserialize(x.answerJson)
-        const isCorrect : boolean = question.correctAnswer === userAnswer
+        
+        let attemptRecords: AttemptRecord[] = []; // Initialize empty list
 
-        return {
-            isCorrect: isCorrect,
-            answer: x.answerJson,
-            questionId: x.questionId,
-            attemptId: attemptId,
-        } as AttemptRecord;
-
-    })
+        // Example object creation and appending
+        attemptRecords.push({
+            answer: JSON.stringify(answerSet),
+            questionId: questionId,
+            attemptId: attemptId
+        } as Partial<AttemptRecord> as AttemptRecord);
+    }
 
     const savedAttempt = await prisma.attempt.create({
         data: {
@@ -56,7 +58,7 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
             userId: answer.userid,
             score: 0,
             attemptQuestions: {
-                create: results.map(record => ({
+                create: attemptRecords.map(record => ({
                     questionId: record.questionId,
                     attemptId: record.attemptId,
                     answer: record.answer,
@@ -75,7 +77,7 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
 
 export const getQuizs = async (
     quizGetData: QuizQueryData = {},
-    detail:Boolean = false
+    detail: Boolean = false
 ): Promise<QuizEntity[]> => {
     const {
         page = 1,
@@ -86,42 +88,38 @@ export const getQuizs = async (
         username,
         sortDirection = 'desc',
         isPublished = true,
-      } = quizGetData;
-    
-      const byAuthor = userId || email || username;
-      const search = filterSearchTerm(searchTerm);
-    
-      const where: any = {
+    } = quizGetData;
+
+    const byAuthor = userId || email || username;
+    const search = filterSearchTerm(searchTerm);
+
+    const where: any = {
         ...(quizGetData.id && { id: quizGetData.id }),
         isPublished,
         ...(byAuthor && {
-          author: {
             OR: [
-              userId ? { id: userId } : undefined,
-              email ? { email } : undefined,
-              username ? { username } : undefined,
-            ].filter(Boolean), // Remove undefined values
-          },
+                userId ? { authorid: userId } : undefined,
+                email ? { authorname: email } : undefined,
+                username ? { authorname: username } : undefined, 
+            ].filter(Boolean), 
         }),
         ...(search && {
-          OR: [
-            { title: { contains: search, mode: 'insensitive' } },
-            { content: { contains: search, mode: 'insensitive' } },
-            { author: { username: { contains: search, mode: 'insensitive' } } },
-            { author: { name: { contains: search, mode: 'insensitive' } } },
-          ],
+            OR: [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+                { authorname: { contains: search, mode: 'insensitive' } }, // Match correct field name
+            ],
         }),
-      };
-    
+    };
     let quiz = await prisma.quiz.findMany({
-        ...where,
+        where,
         orderBy: {
-          updatedAt: sortDirection as SortDirection,
+            updatedAt: sortDirection as SortDirection,
         },
-        include: {
-            questions: detail
-        }
-      });
+        include: detail ? { questions: true } : undefined,
+        take: limit,
+        skip: (page - 1) * limit,
+    });
+
     return quiz;
 };
-

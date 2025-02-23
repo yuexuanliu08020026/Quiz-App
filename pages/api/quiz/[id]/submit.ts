@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { submitQuiz } from "@/lib-server/services/quiz";
 import { QuizAnswerSubmit } from "@/types/models/Quiz";
 
-// /api/quiz/submit
+// /api/quiz/[id]/submit
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
         return res.status(405).json({ error: "Method Not Allowed" });

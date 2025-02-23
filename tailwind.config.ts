@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        skin: {
+          main: 'bg-teal-600',
+        },
       },
     },
   },

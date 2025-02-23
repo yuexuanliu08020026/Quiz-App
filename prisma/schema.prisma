@@ -68,7 +68,8 @@ model Question {
   quizId           String            @map("quiz_id") // foreign key
   quiz             Quiz              @relation(fields: [quizId], references: [id]) // Establish relation
   attemptEntry     AttemptRecord[]
-  correctAnswer    Json
+  answerOptions    String
+  correctAnswer    String
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 }

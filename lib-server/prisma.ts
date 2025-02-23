@@ -5,17 +5,23 @@ import {PrismaClient, User } from '@prisma/client';
 import { ClientUser } from '@/types/models/User';
 
 // declares variable prisma
-let prisma: PrismaClient = new PrismaClient();
+let prisma: PrismaClient = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error']
+});;
 
 
 if (typeof window === 'undefined') { // check if we running on server
 
   if (process.env.NODE_ENV === 'production') {
-    prisma = new PrismaClient();
+    prisma = new PrismaClient({
+      log: ['query', 'info', 'warn', 'error']
+    });
   } 
   else {
     if (!global.prisma) {
-      global.prisma = new PrismaClient();
+      global.prisma = new PrismaClient({
+        log: ['query', 'info', 'warn', 'error']
+      });      
     }
     prisma = global.prisma;
   }
