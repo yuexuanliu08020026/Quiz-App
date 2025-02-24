@@ -16,5 +16,5 @@ export type UserLoginData = {
 
 // create new type by selecting from existing type.
 export type UserCreateData = RequiredNotNull<
-  Pick<User, 'username' | 'email' | 'password'>
+  Pick<User, 'username' | 'email' | 'password' | 'role'>
 >;

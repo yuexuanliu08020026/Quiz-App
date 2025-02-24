@@ -93,7 +93,7 @@ model AttemptRecord {
   questionId        String           @map("question_id")
   question          Question         @relation(fields: [questionId], references: [id])
   answer            String
-  isCorrect         Boolean
+  isCorrect         Boolean?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }

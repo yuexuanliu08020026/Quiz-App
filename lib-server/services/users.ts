@@ -52,6 +52,7 @@ export const createUser = async (userCreateData: UserCreateData): Promise<Client
         username,
         email,
         password,
+        role: userCreateData.role
       },
     });
   

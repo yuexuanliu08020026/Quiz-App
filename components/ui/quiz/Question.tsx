@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { QuestionEntity } from "@/types/models/Question";
 import { Answer } from "@/types/models/Answer";
 
 type Props = {
   question: QuestionEntity;
-  handleAnswer: (selectedOption: Answer) => void;
+  registerRef: (getter: () => Answer[]) => void;
 };
 
-const Question = ({ question, handleAnswer }: Props) => {
-  console.log("Type of question.answerOptions:", typeof question.answerOptions);
-  console.log("Value of question.answerOptions:", question.answerOptions);
+const Question = ({ question, registerRef }: Props) => {
+  const [answers, setAnswers] = useState<Answer[]>(new Array<Answer>());
+
+  useEffect(() => {
+    registerRef(() => answers);
+  }, [answers]);
   
   return (
     <div>
@@ -19,22 +22,22 @@ const Question = ({ question, handleAnswer }: Props) => {
             {question.content}
           </h1>
           {
-          question && (
-            <>
-              {question.answerOptions.map((option, index) => {
+              question?.answerOptions.map((option, index) => {
+                const isSelected = answers.some((ans) => ans.id === option.id);
                 return (
                   <p
-                    className=" font-medium drop-shadow-sm my-2 bg-teal-600 text-white p-3 rounded-xl pl-5 hover:bg-teal-700 transition-all cursor-pointer"
-                    onClick={async () => {
-                      () => handleAnswer(option)
+                    className={` font-medium drop-shadow-sm my-2 ${isSelected ? "bg-teal-700":"bg-teal-600"} text-white p-3 rounded-xl pl-5 hover:bg-teal-700 transition-all cursor-pointer`}
+                    onClick={() => {
+                      setAnswers((prevAnswer) => {
+                        console.log("Previous Answer:", prevAnswer);
+                        return [option];
+                      });
                     }}
                   >
                     {option.content}
                   </p>
                 );
               })}
-            </>
-          )}
           <br />
           <hr />
           <br />

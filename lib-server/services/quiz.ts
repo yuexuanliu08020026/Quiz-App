@@ -27,7 +27,6 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
     }
 
     let qlist = quiz.questions;
-    const attemptId = createId();
     let attemptRecords: AttemptRecord[] = new Array<AttemptRecord>();
 
     for (const [questionId, answerSet] of Object.entries(answer.qaList)) {
@@ -40,27 +39,22 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
             question = questions[0]
             console.log(`Processing Question ID: ${questionId}`);
         }
-        
-        let attemptRecords: AttemptRecord[] = []; // Initialize empty list
-
-        // Example object creation and appending
-        attemptRecords.push({
+        const record = {
             answer: JSON.stringify(answerSet),
             questionId: questionId,
-            attemptId: attemptId
-        } as Partial<AttemptRecord> as AttemptRecord);
+        } as Partial<AttemptRecord> as AttemptRecord
+
+        attemptRecords.push(record);
     }
 
     const savedAttempt = await prisma.attempt.create({
         data: {
-            id: attemptId,
             quizId: answer.quizid,
             userId: answer.userid,
             score: 0,
             attemptQuestions: {
                 create: attemptRecords.map(record => ({
                     questionId: record.questionId,
-                    attemptId: record.attemptId,
                     answer: record.answer,
                     isCorrect: record.isCorrect,
                 })) as Prisma.AttemptRecordUncheckedCreateWithoutAttemptInput[]
