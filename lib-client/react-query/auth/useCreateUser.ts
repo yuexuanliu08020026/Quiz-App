@@ -30,7 +30,6 @@ export const useCreateUser = () => {
       if (!response.ok) {
         throw new Error("Failed to create user");
       }
-
       await router.push("/auth/login"); // Redirect after signup
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

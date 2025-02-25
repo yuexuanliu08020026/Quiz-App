@@ -25,7 +25,11 @@ const LoginPage = () => {
             return;
         }
 
-        const { redirect } = router.query;
+        let { redirect } = router.query;
+        if (!redirect){
+            redirect = sessionStorage.getItem("redirectPath") || "/";
+            sessionStorage.removeItem("redirectPath");
+        }
 
         // Redirect to the original requested page or dashboard if not found
         router.push(typeof redirect === 'string' ? redirect : '/');

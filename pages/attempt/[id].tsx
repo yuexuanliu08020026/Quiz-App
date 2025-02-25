@@ -110,7 +110,7 @@ const AttemptEntityPage: React.FC = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, resolvedUrl }) => {
   try {
     const session = await verifySession(req);
     if (!session) throw new Error("Unauthorized");
@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       res.setHeader("Set-Cookie", clearSession());
     }
 
-    return { redirect: { destination: "/auth/login", permanent: false } };
+    return { redirect: { destination: `/?redirect=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
   }
 };
 

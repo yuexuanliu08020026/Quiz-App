@@ -44,7 +44,10 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
           ) : (
             <div className="space-x-3">
               <button
-                onClick={() => router.push("/auth/login")}
+                onClick={() => {
+                  sessionStorage.setItem("redirectPath", window.location.pathname);
+                  router.push("/auth/login")
+                }}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 Login
