@@ -28,17 +28,15 @@ type QuizEntityType = Quiz & {
 }
 
 export class QuizEntity implements Partial<QuizEntityType> {
-  id!: string;
+  id?: string;
   subject!: string;
   description!: string;
   title!: string;
   authorid!: string;
   authorname!: string;
-  isPublished!: boolean;
-  questions?: QuestionEntity[];
-  finalScore?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  isPublished?: boolean = false;
+  questions: QuestionEntity[] = [];
+  finalScore?: number
 
   constructor(quiz?: any) {
     if (quiz) {

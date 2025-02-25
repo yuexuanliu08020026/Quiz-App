@@ -1,36 +1,41 @@
 import { Question } from "@prisma/client";
 import { Answer } from "@/types/models/Answer";
 import { JsonObject } from "@prisma/client/runtime/library";
+import { AttemptEntity } from "./Attempt";
 
-export class QuestionEntity implements Omit<Question, "correctAnswer" | "answerOptions" | "createdAt" | "updatedAt"> {
-  id!: string;
+export class QuestionEntity implements Partial<Omit<Question, "correctAnswer" | "answerOptions" | "createdAt" | "updatedAt">> {
+  id?: string;
   content!: string;
-  quizId!: string;
-  attemptEntry!: any[];
-  answerOptions!: Answer[];
-  correctAnswer!: Answer[];
+  quizId?: string;
+  attemptEntry?: AttemptEntity[];
+  answerOptions: Answer[] = [];
+  correctAnswer: Answer[] = [];
 
-  constructor(question: Question) {
-    Object.assign(this, question);
-
-    try {
-      this.answerOptions = JSON.parse(question.answerOptions).map(
-        (option: JsonObject) =>{
-          return Answer.deserialize(JSON.stringify(option))
-        }
-      );
-      this.correctAnswer = JSON.parse(question.correctAnswer).map(
-        (ans: JsonObject) =>{
-          return Answer.deserialize(JSON.stringify(ans))
-        }
-      );
-    } catch (error) {
+  constructor(param: string | Question) {
+    if (typeof param === "string") {
+      // If a string is provided, initialize with content only
+      this.content = param;
       this.answerOptions = [];
       this.correctAnswer = [];
     }
-  }
+    else{
+      Object.assign(this, param);
 
-  isCorrect(answer: Answer): boolean {
-    return true;
+      try {
+        this.answerOptions = JSON.parse(param.answerOptions).map(
+          (option: JsonObject) =>{
+            return Answer.deserialize(JSON.stringify(option))
+          }
+        );
+        this.correctAnswer = JSON.parse(param.correctAnswer).map(
+          (ans: JsonObject) =>{
+            return Answer.deserialize(JSON.stringify(ans))
+          }
+        );
+      } catch (error) {
+        this.answerOptions = [];
+        this.correctAnswer = [];
+      }
+    }
   }
 }

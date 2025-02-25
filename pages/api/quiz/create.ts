@@ -20,7 +20,8 @@ export default async function handler(
 const createOneQuiz = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const session = await verifySession(req);
-        const submitFormData:QuizEntity = JSON.parse(req.body);
+        const submitFormData: QuizEntity = req.body; 
+        console.log(`Receive Quiz Create Form Data ${submitFormData}}`)
         const quiz = await createQuiz(submitFormData, session);
         return res.status(201).json(quiz);
     } catch (error: any) {

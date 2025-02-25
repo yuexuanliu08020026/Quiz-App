@@ -37,9 +37,9 @@ export abstract class Answer {
 
 
 export class SingleChoiceAnswer extends Answer {
-    content: number;
+    content: string;
 
-    constructor(id: number, content: number) {
+    constructor(id: number, content: string) {
         super(AnswerType.SingleChoice, id, content);
         this.content = content;
     }

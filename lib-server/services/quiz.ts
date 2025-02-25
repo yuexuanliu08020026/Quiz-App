@@ -5,9 +5,56 @@ import { QuizAnswerSubmit, QuizQueryData, QuizEntity } from "@/types/models/Quiz
 import { SortDirection } from '@/types';
 import { filterSearchTerm } from '@/utils';
 import { AttemptEntity } from "@/types/models/Attempt";
+import { QuestionEntity } from "@/types/models/Question";
+import { Session } from '@/types/models/Session';
+
+export const createQuiz = async (quizDetail: QuizEntity, session: Session): Promise<QuizEntity> => {
+    const userId = session.id;
+    const userName = session.username;
+
+    if (!userId || !userName) {
+        throw new ApiError("Unauthenticated", 403);
+    }
+
+    const savedQuiz = await prisma.quiz.create({
+        data: {
+            authorid: userId,
+            authorname: userName,
+            title: quizDetail.title,
+            subject: quizDetail.subject,
+            description: quizDetail.description,
+            isPublished: quizDetail.isPublished ? quizDetail.isPublished : true,
+            questions: quizDetail.questions && quizDetail.questions.length > 0
+                ? {
+                    create: quizDetail.questions.map(question => ({
+                        content: question.content,
+                        answerOptions: JSON.stringify(question.answerOptions ?? []), // Convert array to string
+                        correctAnswer: JSON.stringify(question.correctAnswer ?? []) // Convert array to string
+                    }))
+                }
+                : undefined
+        },
+        include: {
+            questions: true // Ensure questions are returned
+        }
+    });
+
+    // **Parse JSON fields back into arrays**
+    return new QuizEntity({
+        ...savedQuiz,
+        questions: savedQuiz.questions.map(question => new QuestionEntity({
+            ...question,
+            answerOptions: JSON.parse(question.answerOptions), // Convert back to array
+            correctAnswer: JSON.parse(question.correctAnswer) // Convert back to array
+        }))
+    });
+};
+
+
+
 
 // Submit quiz and get check result
-export const submitQuiz = async(answer: QuizAnswerSubmit, session: any): Promise<AttemptEntity> =>{
+export const submitQuizAnswer = async(answer: QuizAnswerSubmit, session: any): Promise<AttemptEntity> =>{
     const query: QuizQueryData = {
         id: answer.quizid,
         isPublished: true
@@ -114,5 +161,5 @@ export const getQuizs = async (
         skip: (page - 1) * limit,
     });
 
-    return quiz;
+    return quiz.map((x) => new QuizEntity(x));;
 };

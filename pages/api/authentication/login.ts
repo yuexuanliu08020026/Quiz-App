@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ClientUser } from '@/types/models/User';
 import { userLogin } from '@/lib-server/services/login';
 import { createSession } from '@/lib-server/services/session';
+import { Session } from '@/types/models/Session';
 
 export default async function handler(
     req: NextApiRequest,
@@ -28,7 +29,7 @@ const loginUser = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(error?.statusCode || 400).json({ message: error?.message });
         }
         // Create session cookie
-        const sessionCookie = createSession({ id: user.id, email: user.email, username:user.username });
+        const sessionCookie = createSession({ id: user.id, email: user.email, username:user.username } as Session);
         res.setHeader('Set-Cookie', sessionCookie);
 
         return res.status(200).json(user);

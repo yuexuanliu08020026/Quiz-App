@@ -87,7 +87,7 @@ const AttemptEntityPage: React.FC = () => {
                       ))}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {question.isCorrect === null ? "Pending" : question.isCorrect ? "✅ Correct" : "❌ Incorrect"}
+                      {question.isCorrect === null ? "Pending" : question.isCorrect ? "Correct" : "Incorrect"}
                     </td>
                   </tr>
                 );

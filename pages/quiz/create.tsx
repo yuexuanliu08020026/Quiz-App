@@ -36,7 +36,10 @@ export default function QuizForm() {
       const updatedQuestions = [...prevQuiz.questions];
       const question = updatedQuestions[questionIndex];
       const newAnswerId = question.answerOptions.length + 1;
-      question.answerOptions = [...question.answerOptions, { id: newAnswerId, type: 0, content: "" }];
+      const newAnswer = new SingleChoiceAnswer(newAnswerId, "");
+
+      question.answerOptions = [...question.answerOptions, newAnswer];
+
       return { ...prevQuiz, questions: updatedQuestions };
     });
   };
@@ -60,8 +63,13 @@ export default function QuizForm() {
       ...quiz,
       questions: quiz.questions.map((q) => ({
         ...q,
-        answerOptions: JSON.stringify(q.answerOptions),
-        correctAnswer: JSON.stringify(q.correctAnswer.slice(0, 1)), 
+        answerOptions: q.answerOptions.map(a => ({
+          id: a.id,
+          type: a.type,
+          content: a.content,
+        })),
+
+        correctAnswer: q.correctAnswer.slice(0, 1),
       })),
     };
 
@@ -76,7 +84,7 @@ export default function QuizForm() {
     } else {
       console.error("Failed to submit quiz");
     }
-  };
+};
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">

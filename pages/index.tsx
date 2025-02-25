@@ -1,15 +1,10 @@
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 import { clearSession, verifySession } from "@/lib-server/services/session";
-
-interface UserSession {
-  id: string;
-  email: string;
-  username: string;
-}
+import { Session } from "@/types/models/Session";
 
 interface HomePageProps {
-  session: UserSession | null;
+  session: Session;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ session }) => {
