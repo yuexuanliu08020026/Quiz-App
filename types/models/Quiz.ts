@@ -22,12 +22,12 @@ export type QuizAnswerSubmit = {
   qaList: Record<string, Set<Answer>>;
 }
 
-type QuizEntityType = Omit<Quiz, "createdAt" | "updatedAt"> & {
+type QuizEntityType = Quiz & {
   questions?: QuestionEntity[],
   finalScore?: number
 }
 
-export class QuizEntity implements QuizEntityType {
+export class QuizEntity implements Partial<QuizEntityType> {
   id!: string;
   subject!: string;
   description!: string;
@@ -36,7 +36,9 @@ export class QuizEntity implements QuizEntityType {
   authorname!: string;
   isPublished!: boolean;
   questions?: QuestionEntity[];
-  finalScore?: number
+  finalScore?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor(quiz?: any) {
     if (quiz) {

@@ -69,7 +69,8 @@ export const submitQuiz = async(answer: QuizAnswerSubmit, session: any): Promise
 
 export const getQuizs = async (
     quizGetData: QuizQueryData = {},
-    detail: Boolean = false
+    detail: Boolean = false,
+    returnAnswer: Boolean = false
 ): Promise<QuizEntity[]> => {
     const {
         page = 1,

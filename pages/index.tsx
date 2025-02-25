@@ -31,10 +31,12 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
               </span>
               <button
                 className="text-red-500 hover:underline"
-                onClick={() => {
-                  document.cookie = "user_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                  router.reload();
-                }}
+                onClick={async() => {
+                 await fetch(`/api/authentication/logout`, {
+                    method: "POST"
+                })
+                router.reload()
+              }}
               >
                 Logout
               </button>
@@ -63,7 +65,7 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
 
         <div className="flex space-x-4">
           <button
-            onClick={() => router.push("/quiz/public")}
+            onClick={() => router.push("/quiz/public-quiz")}
             className="px-6 py-3 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-700 transition"
           >
             On-going Quizs
