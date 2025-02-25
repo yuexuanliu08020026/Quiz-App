@@ -30,13 +30,12 @@ const getOneAttempt = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!session){
             throw new Error("Unauthunized")
         }
-        const attempt = await getAttemptsByUserQuestion(id, session);
-
-        if (!attempt) {
+        const attempts = await getAttemptsByUserQuestion(id, session);
+        if (!attempts || attempts.length == 0) {
             console.warn("No attempt found for this ID or no permission.");
             return res.status(404).json({ error: "No attempt found for this ID or no permission." });
         }
-
+        const attempt = attempts[0]
         console.log("Attempt Found:", attempt);
         return res.status(200).json(attempt);
     } catch (error: any) {

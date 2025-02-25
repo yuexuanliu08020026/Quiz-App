@@ -70,13 +70,13 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
           </button>
           <button
             onClick={() => router.push(`/quiz/presenter`)}
-            className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg hover:bg-purple-700 transition"
+            className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition"
           >
             Find Persentation
           </button>
           <button
             onClick={() => router.push(`/quiz/user/${session?.id}`)}
-            className="px-6 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-purple-700 transition"
+            className="px-6 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition"
           >
             Find Your Quizs
           </button>
