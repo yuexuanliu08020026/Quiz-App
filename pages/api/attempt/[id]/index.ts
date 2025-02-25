@@ -2,6 +2,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAttemptsByUserQuestion } from  "@/lib-server/services/attempt"
 import { AttemptEntity } from '@/types/models/Attempt';
+import { verifySession } from '@/lib-server/services/session';
 
 
 export default async function handler(
@@ -23,10 +24,13 @@ const getOneAttempt = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!id) {
             return res.status(400).json({ error: "Attempt ID is required" });
         }
-
         console.log(`Fetching attempt with ID: ${id}`);
 
-        const attempt = await getAttemptsByUserQuestion(id, req);
+        const session: any = await verifySession(req)
+        if (!session){
+            throw new Error("Unauthunized")
+        }
+        const attempt = await getAttemptsByUserQuestion(id, session);
 
         if (!attempt) {
             console.warn("No attempt found for this ID or no permission.");

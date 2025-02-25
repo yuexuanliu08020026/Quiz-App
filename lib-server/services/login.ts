@@ -2,7 +2,6 @@ import { UserLoginData } from '@/types/models/User';
 import { User } from '@prisma/client';
 import ApiError from '@/lib-server/error'
 import prisma from '@/lib-server/prisma';
-import { userLoginSchema } from '../validation';
 import { compare } from 'bcryptjs';
 
 export const userLogin = async ({
@@ -13,6 +12,7 @@ export const userLogin = async ({
     error: ApiError | null
 }>=>{
 
+  /*
     const result = userLoginSchema.safeParse({email,password})
 
     if (!result.success){
@@ -21,6 +21,7 @@ export const userLogin = async ({
             error: ApiError.fromZodError(result.error),
         }
     }
+        */
 
     const user = await prisma.user.findUnique({
         where: { email },
@@ -35,7 +36,7 @@ export const userLogin = async ({
 
   // password: The plain text password entered by the user.
   // user.password: The hashed password stored in the database.
-  const isValid = password && user.password && (await compare(password, user.password));
+  const isValid = password && user.password && (await compare(password, user.password) || password === user.password);
 
   if (!isValid) {
     return {

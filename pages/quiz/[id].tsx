@@ -4,7 +4,8 @@ import Document from "@/components/ui/Document";
 import StartCard from "@/components/ui/quiz/StartCard";
 import Question from "@/components/ui/quiz/Question";
 import { QuizAnswerSubmit, QuizEntity } from "@/types/models/Quiz";
-import { Answer } from "@/types/models/Answer";
+import { GetServerSideProps } from "next";
+import { clearSession, verifySession } from "@/lib-server/services/session";
 
 const Home = () => {
     const router = useRouter();
@@ -22,7 +23,9 @@ const Home = () => {
         setLoading(true);
         try {
             let url = `/api/quiz/${id}${detail ? "?detail=true" : ""}`;
-            const response = await fetch(url);
+            const response = await fetch(url,{
+                credentials: 'include',
+            });
             if (!response.ok) {
                 throw new Error(`Quiz not found (Status: ${response.status})`);
             }
@@ -52,7 +55,6 @@ const Home = () => {
         });
 
         const quizSubmitForm: QuizAnswerSubmit = {
-            userid: "user123",
             quizid: id as string,
             qaList,
         };
@@ -65,6 +67,7 @@ const Home = () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(quizSubmitForm),
+            credentials: 'include',
         }).then(async (res) => {
             if (res.ok) {
                 const data = await res.json();
@@ -168,6 +171,21 @@ const Home = () => {
             </div>
         </div>
     );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+    try {
+        const session = await verifySession(req);
+        if (!session) throw new Error("Unauthorized");
+
+        return { props: { session } };
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            res.setHeader("Set-Cookie", clearSession());
+        }
+
+        return { redirect: { destination: "/auth/login", permanent: false } };
+    }
 };
 
 export default Home;

@@ -9,7 +9,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ClientUser } from '@/types/models/User';
-import { getMe, getUser } from '@/lib-server/services/users';
+import { getUser } from '@/lib-server/services/users';
 
 export default async function handler(
     req: NextApiRequest,

@@ -1,47 +1,41 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { UserLoginData } from '@/types/models/User';
 
-export default function LoginPage() {
-    const [formData, setFormData] = useState<UserLoginData>({ email: '', password: '' });
+const LoginPage = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null); 
+        setError(null);
 
-        if (!formData.email || !formData.password) {
-            setError('Both fields are required.');
+        const response = await fetch('/api/authentication/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setError(data.error || 'Login failed');
             return;
         }
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+        const { redirect } = router.query;
 
-            if (!response.ok) {
-                throw new Error('Invalid email or password');
-            }
-
-            router.push('/dashboard'); // Redirect to dashboard on success
-        } catch (err: any) {
-            setError(err.message);
-        }
+        // Redirect to the original requested page or dashboard if not found
+        router.push(typeof redirect === 'string' ? redirect : '/dashboard');
     };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
-                
+
                 {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,8 +44,8 @@ export default function LoginPage() {
                         <input
                             type="email"
                             name="email"
-                            value={formData.email}
-                            onChange={handleChange}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                             placeholder="Enter your email"
                             required
@@ -62,8 +56,8 @@ export default function LoginPage() {
                         <input
                             type="password"
                             name="password"
-                            value={formData.password}
-                            onChange={handleChange}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                             placeholder="Enter your password"
                             required
@@ -84,3 +78,5 @@ export default function LoginPage() {
         </div>
     );
 }
+
+export default LoginPage;

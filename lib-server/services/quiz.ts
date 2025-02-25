@@ -4,12 +4,10 @@ import ApiError from '@/lib-server/error';
 import { QuizAnswerSubmit, QuizQueryData, QuizEntity } from "@/types/models/Quiz";
 import { SortDirection } from '@/types';
 import { filterSearchTerm } from '@/utils';
-import { Answer } from "@/types/models/Answer";
-import { createId } from "@paralleldrive/cuid2";
 import { AttemptEntity } from "@/types/models/Attempt";
 
 // Submit quiz and get check result
-export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity> =>{
+export const submitQuiz = async(answer: QuizAnswerSubmit, session: any): Promise<AttemptEntity> =>{
     const query: QuizQueryData = {
         id: answer.quizid,
         isPublished: true
@@ -50,7 +48,7 @@ export const submitQuiz = async(answer: QuizAnswerSubmit): Promise<AttemptEntity
     const savedAttempt = await prisma.attempt.create({
         data: {
             quizId: answer.quizid,
-            userId: answer.userid,
+            userId: session.id,
             score: 0,
             attemptQuestions: {
                 create: attemptRecords.map(record => ({

@@ -1,19 +1,16 @@
 import { AttemptEntity } from "@/types/models/Attempt";
 import { User } from "@prisma/client";
-import { getSession } from 'next-auth/react';
-import { NextApiRequest } from 'next';
+import prisma from '@/lib-server/prisma';
 
 export const getAttemptById = async (
     id: string,
-    req: NextApiRequest
+    session: any
 ): Promise<AttemptEntity | null> => {
-    const session = await getSession({req});
-    const email = session?.user?.email;
-  
+    const email = session?.email
     if (!email) return null;
   
     const me: User | null = await prisma.user.findUnique({ 
-        where: {email} ,
+        where: {email: email} ,
       });
     
     if (!me || me?.id !== id) return null;
@@ -28,11 +25,9 @@ export const getAttemptById = async (
 
 export const getAttemptsByUserQuestion = async (
     id: string,
-    req: NextApiRequest
+    session: any
 ): Promise<AttemptEntity[] | null> => {
-    const session = await getSession({req});
-    const email = session?.user?.email;
-  
+    const email = session?.email
     if (!email) return null;
   
     const me: User | null = await prisma.user.findUnique({ 

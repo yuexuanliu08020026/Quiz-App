@@ -18,7 +18,6 @@ export type QuizQueryData = Partial<{
 }>;
 
 export type QuizAnswerSubmit = {
-  userid: string;
   quizid: string;
   qaList: Record<string, Set<Answer>>;
 }

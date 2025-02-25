@@ -16,29 +16,12 @@ export const useCreateUser = () => {
   const [error, setError] = useState<string | null>(null);
   const [providers, setProviders] = useState<Provider[]>([]);
   const router = useRouter();
-
-  /*
-  // Fetch authentication providers when the component mounts
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const response = await fetch("/api/auth/providers");
-        const data = await response.json();
-        setProviders(data);
-      } catch (err) {
-        console.error("Failed to fetch providers", err);
-      }
-    };
-
-    fetchProviders(); // Call the function inside useEffect
-  }, []); // Empty dependency array → runs only once on mount
-*/
   const createUser = async (user: UserCreateData) => {
     setLoading(true);
     setError(null); // Reset error
 
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/authentication/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),

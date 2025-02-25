@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { GetServerSideProps } from 'next';
+import { verifySession, clearSession } from "@/lib-server/services/session";
 
 interface Attempt {
     id: string;
@@ -17,7 +19,9 @@ const AttemptEntityPage: React.FC = () => {
 
     useEffect(() => {
         if (attemptId) {
-            fetch(`/api/attempt/${attemptId}`)
+            fetch(`/api/attempt/${attemptId}`,{
+                credentials: 'include'
+            })
                 .then(async (res) => {
                     if (!res.ok) {
                         throw new Error("Failed to fetch attempt data");
@@ -54,6 +58,21 @@ const AttemptEntityPage: React.FC = () => {
             </ul>
         </div>
     );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+    try {
+        const session = await verifySession(req);
+        if (!session) throw new Error("Unauthorized");
+
+        return { props: { session } };
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            res.setHeader("Set-Cookie", clearSession());
+        }
+
+        return { redirect: { destination: "/auth/login", permanent: false } };
+    }
 };
 
 export default AttemptEntityPage;
