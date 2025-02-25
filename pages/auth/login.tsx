@@ -28,7 +28,7 @@ const LoginPage = () => {
         const { redirect } = router.query;
 
         // Redirect to the original requested page or dashboard if not found
-        router.push(typeof redirect === 'string' ? redirect : '/dashboard');
+        router.push(typeof redirect === 'string' ? redirect : '/');
     };
 
     return (
