@@ -5,6 +5,7 @@ import { clearSession, verifySession } from "@/lib-server/services/session";
 interface UserSession {
   id: string;
   email: string;
+  username: string;
 }
 
 interface HomePageProps {
@@ -27,7 +28,7 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
                 className="text-gray-700 cursor-pointer hover:text-blue-600 transition"
                 onClick={() => router.push(`/user/${session.id}`)}
               >
-                Hello, {session.email} 👋
+                Hello, {session.username}
               </span>
               <button
                 className="text-red-500 hover:underline"
@@ -64,7 +65,7 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center space-y-6">
-        <h2 className="text-2xl font-bold text-gray-800">Welcome to Quiz App 🎉</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Welcome to Quiz App </h2>
 
         <div className="flex space-x-4">
           <button
@@ -78,12 +79,6 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
             className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition"
           >
             Find Persentation
-          </button>
-          <button
-            onClick={() => router.push(`/quiz/user/${session?.id}`)}
-            className="px-6 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition"
-          >
-            Find Your Quizs
           </button>
         </div>
       </main>

@@ -28,7 +28,7 @@ const loginUser = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(error?.statusCode || 400).json({ message: error?.message });
         }
         // Create session cookie
-        const sessionCookie = createSession({ id: user.id, email: user.email });
+        const sessionCookie = createSession({ id: user.id, email: user.email, username:user.username });
         res.setHeader('Set-Cookie', sessionCookie);
 
         return res.status(200).json(user);

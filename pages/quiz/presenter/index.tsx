@@ -31,7 +31,7 @@ export default function Home() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="text-center text-gray-900">
         <h1 className="text-2xl font-bold mb-6 flex items-center justify-center">
-          <span className="mr-2">📊</span> Find Presenter
+          Find Presenter
         </h1>
         <p className="text-lg mb-4">Join presentation</p>
         <div className="bg-white p-3 rounded-lg shadow-md w-80">
