@@ -8,15 +8,17 @@ const COOKIE_NAME = 'user_session';
 // Generate a session token
 export const createSession = (session: Session) => {
     const token = jwt.sign(session, SECRET_KEY, { expiresIn: '1h' });
+    console.log(`Running Environment ${process.env.NODE_ENV}`)
     return serialize(COOKIE_NAME, token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
         path: '/',
     });
 };
 export const verifySession = async (req: any) => {
     const cookies = req.headers.cookie;
+    console.log(`Request Cookie ${JSON.stringify(cookies)}`)
     if (!cookies){
         throw new Error("Unauthunized")
     }
