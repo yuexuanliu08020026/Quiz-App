@@ -22,16 +22,13 @@ export class QuestionEntity implements Partial<Omit<Question, "correctAnswer" | 
       Object.assign(this, param);
 
       try {
-        this.answerOptions = JSON.parse(param.answerOptions).map(
-          (option: JsonObject) =>{
-            return Answer.deserialize(JSON.stringify(option))
-          }
-        );
-        this.correctAnswer = JSON.parse(param.correctAnswer).map(
-          (ans: JsonObject) =>{
-            return Answer.deserialize(JSON.stringify(ans))
-          }
-        );
+        this.answerOptions = Array.isArray(param.answerOptions)
+        ? param.answerOptions.map((option: JsonObject) => Answer.deserialize(JSON.stringify(option)))
+        : JSON.parse(param.answerOptions || "[]").map((option: JsonObject) => Answer.deserialize(JSON.stringify(option)));
+
+    this.correctAnswer = Array.isArray(param.correctAnswer)
+        ? param.correctAnswer.map((ans: JsonObject) => Answer.deserialize(JSON.stringify(ans)))
+        : JSON.parse(param.correctAnswer || "[]").map((ans: JsonObject) => Answer.deserialize(JSON.stringify(ans)));
       } catch (error) {
         this.answerOptions = [];
         this.correctAnswer = [];

@@ -134,7 +134,7 @@ const Home = () => {
                                             <Question
                                                 question={question}
                                                 registerRef={(getter) => {
-                                                    questionRefs.current[question.id] = getter;
+                                                    questionRefs.current[question.id? question.id : 0] = getter;
                                                 }}
                                             />
                                         </div>

@@ -40,7 +40,15 @@ export class QuizEntity implements Partial<QuizEntityType> {
 
   constructor(quiz?: any) {
     if (quiz) {
-      Object.assign(this, quiz);
+      this.id = quiz.id;
+      this.subject = quiz.subject;
+      this.description = quiz.description;
+      this.title = quiz.title;
+      this.authorid = quiz.authorid;
+      this.authorname = quiz.authorname;
+      this.isPublished = quiz.isPublished ?? false;
+      this.finalScore = quiz.finalScore ?? undefined;
+
       this.questions =
         quiz.questions?.map((question: any) => new QuestionEntity(question)) || [];
     } else {

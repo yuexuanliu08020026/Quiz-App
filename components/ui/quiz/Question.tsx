@@ -13,7 +13,7 @@ const Question = ({ question, registerRef }: Props) => {
   useEffect(() => {
     registerRef(() => answers);
   }, [answers]);
-  
+
   return (
     <div>
       <div className="flex flex-col justify-center h-[90vh]">

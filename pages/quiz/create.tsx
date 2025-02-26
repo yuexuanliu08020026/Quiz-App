@@ -58,6 +58,32 @@ export default function QuizForm() {
     });
   };
 
+
+  const addCorrectAnswer = (questionIndex: number) => {
+    setQuiz((prevQuiz) => {
+      const updatedQuestions = [...prevQuiz.questions];
+      const question = updatedQuestions[questionIndex];
+      const newAnswerId = question.correctAnswer.length + 1;
+      const newAnswer = new SingleChoiceAnswer(newAnswerId, "");
+
+      question.correctAnswer = [...question.correctAnswer, newAnswer];
+
+      return { ...prevQuiz, questions: updatedQuestions };
+    });
+  };
+  const updateCorrectAnswer = (qIndex: number, aIndex: number, value: string) => {
+    setQuiz((prevQuiz) => {
+      const updatedQuestions = [...(prevQuiz.questions || [])];
+      if (updatedQuestions[qIndex]?.correctAnswer) {
+        const oldAnswer = updatedQuestions[qIndex].correctAnswer[aIndex];
+        updatedQuestions[qIndex].correctAnswer[aIndex] = new SingleChoiceAnswer(
+          oldAnswer.id,
+          value
+        );
+      }
+      return { ...prevQuiz, questions: updatedQuestions };
+    });
+  };
   const submitQuiz = async () => {
     const formattedQuiz = {
       ...quiz,
@@ -78,9 +104,9 @@ export default function QuizForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formattedQuiz),
     });
-
     if (response.ok) {
-      router.push("/quiz/success");
+      const createdQuiz: QuizEntity = await response.json()
+      router.push(`/quiz/${createdQuiz.id}`);
     } else {
       console.error("Failed to submit quiz");
     }
@@ -102,12 +128,18 @@ export default function QuizForm() {
         onChange={(e) => setQuiz({ ...quiz, description: e.target.value })}
         className="w-full border p-2 mb-4"
       ></textarea>
+      <textarea
+        placeholder="Quiz Subject"
+        value={quiz.subject}
+        onChange={(e) => setQuiz({ ...quiz, subject: e.target.value })}
+        className="w-full border p-2 mb-4"
+      ></textarea>
 
       {quiz.questions.map((q, qIndex) => (
         <div key={qIndex} className="mb-4 p-4 border rounded">
           <input
             type="text"
-            placeholder="Question Content"
+            placeholder="Quiz Content"
             value={q.content}
             onChange={(e) => updateQuestion(qIndex, "content", e.target.value)}
             className="w-full border p-2 mb-2"
@@ -129,6 +161,24 @@ export default function QuizForm() {
             className="bg-blue-500 text-white px-4 py-2 rounded"
           >
             + Add Answer
+          </button>
+          {q.correctAnswer.map((a, aIndex) => (
+            <div key={aIndex} className="flex gap-2 mb-2">
+              <input
+                type="text"
+                placeholder="Correct Answer"
+                value={a.content}
+                onChange={(e) => updateCorrectAnswer(qIndex, aIndex, e.target.value)}
+                className="w-full border p-2"
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => addCorrectAnswer(qIndex)}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            + Add Correct Answer
           </button>
         </div>
       ))}

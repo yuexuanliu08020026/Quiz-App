@@ -22,7 +22,7 @@ const createOneQuiz = async (req: NextApiRequest, res: NextApiResponse) => {
         const session = await verifySession(req);
         const submitFormData: QuizEntity = req.body; 
         console.log(`Receive Quiz Create Form Data ${submitFormData}}`)
-        const quiz = await createQuiz(submitFormData, session);
+        const quiz: QuizEntity = await createQuiz(submitFormData, session);
         return res.status(201).json(quiz);
     } catch (error: any) {
         console.error("API Error:", error);

@@ -75,6 +75,12 @@ const HomePage: React.FC<HomePageProps> = ({ session }) => {
           >
             Find Persentation
           </button>
+          <button
+            onClick={() => router.push(`/quiz/create`)}
+            className="px-6 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition"
+          >
+            Create Quiz
+          </button>
         </div>
       </main>
     </div>
