@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { GetServerSideProps } from "next";
-import { verifySession, clearSession } from "@/lib-server/services/session";
 
 interface AttemptQuestion {
   id: string;
   questionId: string;
-  answer: string; // JSON string containing selected answer
+  answer: string;
   isCorrect: boolean | null;
 }
 
@@ -62,7 +60,6 @@ const AttemptEntityPage: React.FC = () => {
           <span className="font-semibold">Score:</span> <span className="text-blue-600">{attempt?.score}</span>
         </p>
 
-        {/* Answers Table */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
@@ -74,7 +71,7 @@ const AttemptEntityPage: React.FC = () => {
             </thead>
             <tbody>
               {attempt?.attemptQuestions.map((question) => {
-                const parsedAnswer = JSON.parse(question.answer); // Convert JSON string to object
+                const parsedAnswer = JSON.parse(question.answer);
 
                 return (
                   <tr key={question.id} className="hover:bg-gray-100">
@@ -96,7 +93,6 @@ const AttemptEntityPage: React.FC = () => {
           </table>
         </div>
 
-        {/* Back Button */}
         <div className="mt-6 text-center">
           <button
             onClick={() => router.push("/")}
@@ -108,21 +104,6 @@ const AttemptEntityPage: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async ({ req, res, resolvedUrl }) => {
-  try {
-    const session = await verifySession(req);
-    if (!session) throw new Error("Unauthorized");
-
-    return { props: { session } };
-  } catch (error: any) {
-    if (error.name === "TokenExpiredError") {
-      res.setHeader("Set-Cookie", clearSession());
-    }
-
-    return { redirect: { destination: `/?redirect=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
-  }
 };
 
 export default AttemptEntityPage;

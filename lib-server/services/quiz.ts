@@ -92,10 +92,11 @@ export const submitQuizAnswer = async(answer: QuizAnswerSubmit, session: any): P
         attemptRecords.push(record);
     }
 
+    const userId = session?.id || "anonymous";
     const savedAttempt = await prisma.attempt.create({
         data: {
             quizId: answer.quizid,
-            userId: session.id,
+            userId: userId,
             score: 0,
             attemptQuestions: {
                 create: attemptRecords.map(record => ({

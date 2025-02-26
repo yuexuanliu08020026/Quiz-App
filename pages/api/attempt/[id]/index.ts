@@ -25,10 +25,12 @@ const getOneAttempt = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(400).json({ error: "Attempt ID is required" });
         }
         console.log(`Fetching attempt with ID: ${id}`);
-
-        const session: any = await verifySession(req)
-        if (!session){
-            throw new Error("Unauthunized")
+        let session = null
+        try{
+            session = await verifySession(req)
+        }
+        catch(error){
+            
         }
         const attempts = await getAttemptsByUserQuestion(id, session);
         if (!attempts || attempts.length == 0) {

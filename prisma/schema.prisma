@@ -44,7 +44,6 @@ model User {
   image           String?
   role            Role              
   sessions        Session[]
-  attempts        Attempt[]        // answer quiz history
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
@@ -77,8 +76,7 @@ model Question {
 
 model Attempt {
   id                String           @id @default(cuid())
-  userId            String           @map("user_id") // foreign key
-  user              User             @relation(fields: [userId], references: [id])
+  userId            String           
   quizId            String           @map("quiz_id") // foreign key
   quiz              Quiz             @relation(fields: [quizId], references: [id])
   score             Int              @default(0)  // Final score

@@ -27,17 +27,8 @@ export const getAttemptsByUserQuestion = async (
     id: string,
     session: any
 ): Promise<AttemptEntity[] | null> => {
-    const email = session?.email
-    if (!email) return null;
-  
-    const me: User | null = await prisma.user.findUnique({ 
-        where: {email} ,
-      });
-    
-    if (!me) return null;
-    
     let attempt = await prisma.attempt.findMany({
-        where: { id: id, userId: me.id},
+        where: { id: id},
         include: { attemptQuestions: true } ,
     });
 

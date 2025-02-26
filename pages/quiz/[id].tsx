@@ -23,7 +23,7 @@ const Home = () => {
         setLoading(true);
         try {
             let url = `/api/quiz/${id}${detail ? "?detail=true" : ""}`;
-            const response = await fetch(url,{
+            const response = await fetch(url, {
                 credentials: 'include',
             });
             if (!response.ok) {
@@ -126,23 +126,22 @@ const Home = () => {
                             ) : error ? (
                                 <p className="text-red-500">{error}</p>
                             ) : (
-                                <div> Quiz {quiz.title}
-                                    <br />
-                                    Quiz {quiz.subject}
+                                <div className="flex flex-col justify-center">
+                                    <h1 className="text-2xl font-bold text-center text-gray-800">{quiz.title}</h1>
                                     {quiz?.questions?.map((question, index) => (
                                         <div key={question.id} style={{ display: index === currentQuestionIndex ? 'block' : 'none' }}>
                                             <Question
                                                 question={question}
                                                 registerRef={(getter) => {
-                                                    questionRefs.current[question.id? question.id : 0] = getter;
+                                                    questionRefs.current[question.id ? question.id : 0] = getter;
                                                 }}
                                             />
                                         </div>
                                     ))}
-                                    <div className="mt-4 flex space-x-4">
+                                    <div className="flex justify-center space-x-4">
                                         {currentQuestionIndex > 0 && (
                                             <button
-                                                className="bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-700"
+                                                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
                                                 onClick={prevQuestion}
                                             >
                                                 Previous Question
@@ -150,19 +149,21 @@ const Home = () => {
                                         )}
                                         {currentQuestionIndex < (quiz?.questions?.length || 0) - 1 && (
                                             <button
-                                                className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+                                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                                                 onClick={nextQuestion}
                                             >
                                                 Next Question
                                             </button>
                                         )}
                                     </div>
-                                    <button
-                                        className="bg-blue-600 text-white p-3 rounded-lg mt-4 hover:bg-blue-700"
-                                        onClick={handleSubmit}
-                                    >
-                                        Submit Quiz
-                                    </button>
+                                    <div className="flex justify-center mt-1">
+                                        <button
+                                            className="bg-blue-600 text-white p-3 rounded-lg mt-4 hover:bg-blue-700"
+                                            onClick={handleSubmit}
+                                        >
+                                            Submit Quiz
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </>
@@ -173,7 +174,7 @@ const Home = () => {
     );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res, resolvedUrl  }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req, res, resolvedUrl }) => {
     try {
         const session = await verifySession(req);
         if (!session) throw new Error("Unauthorized");
@@ -184,8 +185,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res, resolve
             res.setHeader("Set-Cookie", clearSession());
         }
 
-        return { redirect: { destination: `/auth/login?redirect=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
+        return { props: {} };
     }
+
 };
 
 export default Home;

@@ -9,12 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method !== "POST") {
         return res.status(405).json({ error: "Method Not Allowed" });
     }
-    const session = await verifySession(req);
+    let session = null;
 
-    if (!session) {
-        return res.status(401).json({ error: 'Unauthorized' });
+    try{
+        session = await verifySession(req);
     }
+    catch(error){
 
+    }
     try {
         const quizAnswer: QuizAnswerSubmit = req.body;
         const result : AttemptEntity = await submitQuizAnswer(quizAnswer, session);

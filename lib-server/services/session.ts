@@ -38,7 +38,7 @@ export const verifySession = async (req: any) => {
 export const clearSession = () => {
     return serialize(COOKIE_NAME, '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax',
         path: '/',
         expires: new Date(0),

@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { SingleChoiceAnswer} from "@/types/models/Answer"
 import {QuestionEntity} from "@/types/models/Question"
 import {QuizEntity} from "@/types/models/Quiz"
+import { GetServerSideProps } from "next";
+import { clearSession, verifySession } from "@/lib-server/services/session";
 
 
 export default function QuizForm() {
@@ -201,3 +203,20 @@ export default function QuizForm() {
     </div>
   );
 }
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res, resolvedUrl }) => {
+  try {
+    const session = await verifySession(req);
+    if (!session) throw new Error("Unauthorized");
+
+    return { props: { session } };
+  } catch (error: any) {
+    if (error.name === "TokenExpiredError") {
+      res.setHeader("Set-Cookie", clearSession());
+    }
+
+    return { redirect: { destination: `/auth/login?redirect=${encodeURIComponent(resolvedUrl)}`, permanent: false } };
+  }
+};
+
